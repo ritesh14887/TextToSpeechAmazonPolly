@@ -1,4 +1,4 @@
-# Voiceover Zip Generator
+# Text to Speech with Amazon Polly 
 
 This React application generates text to speech from text data using AWS Polly and packages them into a downloadable zip file.
 
