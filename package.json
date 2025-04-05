@@ -9,10 +9,12 @@
     "@testing-library/user-event": "^13.5.0",
     "aws-sdk": "^2.1692.0",
     "file-saver": "^2.0.5",
+    "firebase": "^11.6.0",
     "jszip": "^3.10.1",
     "papaparse": "^5.5.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-router-dom": "^7.4.1",
     "react-scripts": "5.0.1",
     "web-vitals": "^2.1.4"
   },

@@ -1,9 +1,11 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, use } from 'react';
 import './App.css';
 import { Header } from './components/header';
 import AWS from 'aws-sdk';
 import JsZip from 'jszip';
 import { saveAs } from 'file-saver';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from './context/authContext';
 
 import Papa from 'papaparse';
 
@@ -22,6 +24,17 @@ function App() {
   const [progress, setProgress] = useState(0); // Progress state
 
   const inputFileRef = useRef();
+  const navigate = useNavigate();
+
+  const { userLoggedIn } = useAuth();
+
+  useEffect(() => {
+    if (!userLoggedIn) {
+      navigate('/login');
+    }
+  }
+    , [userLoggedIn]);
+
 
   const reset = () => {
     inputFileRef.current.value = "";
@@ -42,121 +55,6 @@ function App() {
       generateAndDownloadZip(csvData, setLoading, setProgress);
     }
   }, [csvData]);
-
-  // async function generateAndDownloadZip(records) {
-  //   const zip = new JsZip();
-  //   const blobs = []; // Store blobs for zipping
-  //   const serverResponses = []; // Store file names for display
-
-  //   for (const record of records) {
-  //     if (record.Text && record.VoiceId && record.Filename) {
-  //       const params = {
-  //         Engine: "standard",
-  //         OutputFormat: 'mp3',
-  //         Text: record.Text,
-  //         VoiceId: record.VoiceId,
-  //       };
-
-  //       try {
-  //         const data = await new Promise((resolve, reject) => {
-  //           const polly = new AWS.Polly();
-  //           polly.synthesizeSpeech(params, (err, data) => {
-  //             if (err) {
-  //               setError(err.code);
-  //               reset()
-  //               reject(err);
-  //             } else {
-  //               resolve(data);
-  //             }
-  //           });
-  //         });
-
-  //         const uInt8Array = new Uint8Array(data.AudioStream);
-  //         const arrayBuffer = uInt8Array.buffer;
-  //         const blob = new Blob([arrayBuffer]);
-  //         blobs.push({ blob, filename: record.Filename + '.mp3' });
-  //         serverResponses.push(record.Filename + '.mp3');
-
-  //       } catch (err) {
-  //         console.error('Error synthesizing speech:', err);
-  //       }
-  //     }
-  //   }
-
-  //   // Add blobs to the zip
-  //   blobs.forEach(({ blob, filename }) => {
-  //     zip.file(filename, blob);
-  //   });
-
-  //   // Generate the zip and download
-  //   zip.generateAsync({ type: 'blob' }).then((zipBlob) => {
-  //     saveAs(zipBlob, 'voiceovers.zip');
-  //   });
-
-  //   // Update state with server responses (file names)
-  //   setServerResponses(serverResponses);
-  //   reset();
-  // }
-
-  // async function generateAndDownloadZip(records, setLoading) { // Add setLoading as parameter
-  //   setLoading(true); // Start loading
-  //   const zip = new JsZip();
-  //   const blobs = []; // Store blobs for zipping
-  //   const serverResponses = []; // Store file names for display
-
-  //   for (const record of records) {
-  //     if (record.Text && record.VoiceId && record.Filename) {
-  //       const params = {
-  //         Engine: "standard",
-  //         OutputFormat: 'mp3',
-  //         Text: record.Text,
-  //         VoiceId: record.VoiceId,
-  //       };
-
-  //       try {
-  //         const data = await new Promise((resolve, reject) => {
-  //           const polly = new AWS.Polly();
-  //           polly.synthesizeSpeech(params, (err, data) => {
-  //             if (err) {
-  //               setError(err.code);
-  //               reset();
-  //               reject(err);
-  //             } else {
-  //               resolve(data);
-  //             }
-  //           });
-  //         });
-
-  //         const uInt8Array = new Uint8Array(data.AudioStream);
-  //         const arrayBuffer = uInt8Array.buffer;
-  //         const blob = new Blob([arrayBuffer]);
-  //         blobs.push({ blob, filename: record.Filename + '.mp3' });
-  //         serverResponses.push(record.Filename + '.mp3');
-
-  //       } catch (err) {
-  //         console.error('Error synthesizing speech:', err);
-  //       }
-  //     }
-  //   }
-
-  //   // Add blobs to the zip
-  //   blobs.forEach(({ blob, filename }) => {
-  //     zip.file(filename, blob);
-  //   });
-
-  //   // Generate the zip and download
-  //   zip.generateAsync({ type: 'blob' }).then((zipBlob) => {
-  //     saveAs(zipBlob, 'voiceovers.zip');
-  //     setLoading(false); // Stop loading after download
-  //   }).catch((err) => {
-  //     setLoading(false); // stop loading if zip generation fails
-  //     console.error("Error generating zip", err);
-  //   });
-
-  //   // Update state with server responses (file names)
-  //   setServerResponses(serverResponses);
-  //   reset();
-  // }
 
   async function generateAndDownloadZip(records, setLoading, setProgress) {
     setLoading(true);
